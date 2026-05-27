@@ -1,10 +1,18 @@
+import StyleProfileCard from "@/components/core/StyleProfileCard";
+
 export default function DashboardPage() {
   return (
-    <section className="page-section">
+    <main className="page-section">
       <div className="container">
-        <h1>Dashboard</h1>
-        <p>Zona privada del usuario.</p>
+        <header className="page-header">
+          <h1>Dashboard</h1>
+          <p>
+            Resumen inteligente de tu armario y tu identidad de estilo.
+          </p>
+        </header>
+
+        <StyleProfileCard />
       </div>
-    </section>
+    </main>
   );
 }
