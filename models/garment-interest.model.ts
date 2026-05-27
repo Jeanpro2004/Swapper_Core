@@ -67,3 +67,19 @@ export async function getInterestGarmentIdsByUser(userId: string) {
     .select("garment_id")
     .eq("interested_user_id", userId);
 }
+
+export async function getLatestReciprocalInterest(
+  interestedUserId: string,
+  garmentOwnerId: string
+) {
+  const supabase = await createClient();
+
+  return supabase
+    .from("garment_interests")
+    .select("*")
+    .eq("interested_user_id", interestedUserId)
+    .eq("garment_owner_id", garmentOwnerId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+}

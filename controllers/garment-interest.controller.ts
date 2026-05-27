@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth/getAuthenticatedUser";
+import { tryCreateMatchFromInterest } from "@/services/match-engine.service";
 import {
   createGarmentInterest,
   deleteGarmentInterest,
@@ -62,19 +63,33 @@ export async function storeGarmentInterestController(request: NextRequest) {
   }
 
   const { data, error } = await createGarmentInterest({
-    interested_user_id: user.id,
-    garment_id: garmentId,
-    garment_owner_id: garment.owner_id,
-  });
+  interested_user_id: user.id,
+  garment_id: garmentId,
+  garment_owner_id: garment.owner_id,
+});
 
-  if (error) {
-    return NextResponse.json(
-      { error: "No se pudo registrar el interés." },
-      { status: 400 }
-    );
-  }
+if (error) {
+  return NextResponse.json(
+    { error: "No se pudo registrar el interés." },
+    { status: 400 }
+  );
+}
 
-  return NextResponse.json(data, { status: 201 });
+const matchResult = await tryCreateMatchFromInterest({
+  interestedUserId: user.id,
+  targetGarmentId: garmentId,
+  targetGarmentOwnerId: garment.owner_id,
+});
+
+return NextResponse.json(
+  {
+    interest: data,
+    matchCreated: matchResult.matchCreated,
+    match: matchResult.match,
+  },
+  { status: 201 }
+);
+
 }
 
 export async function destroyGarmentInterestController(

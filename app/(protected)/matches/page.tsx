@@ -1,10 +1,18 @@
+import MatchesList from "@/components/core/MatchesList";
+
 export default function MatchesPage() {
   return (
-    <section className="page-section">
+    <main className="page-section">
       <div className="container">
-        <h1>Matches</h1>
-        <p>Aquí aparecerán los matches entre usuarios.</p>
+        <header className="page-header">
+          <h1>Matches</h1>
+          <p>
+            Revisa las oportunidades de intercambio generadas por interés mutuo.
+          </p>
+        </header>
+
+        <MatchesList />
       </div>
-    </section>
+    </main>
   );
 }

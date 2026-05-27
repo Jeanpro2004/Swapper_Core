@@ -64,6 +64,12 @@ export default function GarmentInterestButton({
       return;
     }
 
+    const result = await response.json().catch(() => null);
+
+        if (result?.matchCreated) {
+        alert("¡Match generado! Revisa tu sección de matches.");
+        }
+
     setHasInterest((currentValue) => !currentValue);
   }
 
