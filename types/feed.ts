@@ -14,4 +14,5 @@ export type FeedGarment = {
   style_id: string | null;
   created_at: string;
   styles: FeedStyle | FeedStyle[] | null;
+  hasInterest?: boolean;
 };

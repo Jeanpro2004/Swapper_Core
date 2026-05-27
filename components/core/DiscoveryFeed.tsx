@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import { FeedGarment, FeedStyle } from "@/types/feed";
+import GarmentInterestButton from "@/components/core/GarmentInterestButton";
 
 function getStyleName(styles: FeedStyle | FeedStyle[] | null) {
   if (!styles) {
@@ -85,32 +86,39 @@ export default function DiscoveryFeed() {
         {garments.map((garment) => (
           <article className="garment-card" key={garment.id}>
             <header>
-              <h3>{garment.title}</h3>
-              <p>{garment.description || "Sin descripción"}</p>
+                <h3>{garment.title}</h3>
+                <p>{garment.description || "Sin descripción"}</p>
             </header>
 
             <dl>
-              <div>
+                <div>
                 <dt>Talla</dt>
                 <dd>{garment.size}</dd>
-              </div>
+                </div>
 
-              <div>
+                <div>
                 <dt>Marca</dt>
                 <dd>{garment.brand || "No especificada"}</dd>
-              </div>
+                </div>
 
-              <div>
+                <div>
                 <dt>Estado</dt>
                 <dd>{formatCondition(garment.condition)}</dd>
-              </div>
+                </div>
 
-              <div>
+                <div>
                 <dt>Estilo</dt>
                 <dd>{getStyleName(garment.styles)}</dd>
-              </div>
+                </div>
             </dl>
-          </article>
+
+            <footer className="card-actions">
+                <GarmentInterestButton
+                garmentId={garment.id}
+                initialHasInterest={garment.hasInterest}
+                />
+            </footer>
+            </article>
         ))}
       </div>
     </section>

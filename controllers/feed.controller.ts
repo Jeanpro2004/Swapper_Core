@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth/getAuthenticatedUser";
 import { getDiscoverableGarments } from "@/models/feed.model";
+import { getInterestGarmentIdsByUser } from "@/models/garment-interest.model";
 
 export async function indexFeedController(request: NextRequest) {
   const user = await getAuthenticatedUser(request);
@@ -12,14 +13,34 @@ export async function indexFeedController(request: NextRequest) {
     );
   }
 
-  const { data, error } = await getDiscoverableGarments(user.id);
+  const { data: garments, error: garmentsError } =
+    await getDiscoverableGarments(user.id);
 
-  if (error) {
+  if (garmentsError) {
     return NextResponse.json(
       { error: "No se pudo cargar el feed de prendas." },
       { status: 400 }
     );
   }
 
-  return NextResponse.json(data ?? [], { status: 200 });
+  const { data: interests, error: interestsError } =
+    await getInterestGarmentIdsByUser(user.id);
+
+  if (interestsError) {
+    return NextResponse.json(
+      { error: "No se pudo cargar el estado de intereses." },
+      { status: 400 }
+    );
+  }
+
+  const interestedGarmentIds = new Set(
+    (interests ?? []).map((interest) => interest.garment_id)
+  );
+
+  const feed = (garments ?? []).map((garment) => ({
+    ...garment,
+    hasInterest: interestedGarmentIds.has(garment.id),
+  }));
+
+  return NextResponse.json(feed, { status: 200 });
 }
