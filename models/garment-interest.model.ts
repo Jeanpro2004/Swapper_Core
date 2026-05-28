@@ -11,7 +11,7 @@ export async function getGarmentOwnerSnapshot(garmentId: string) {
 
   return supabase
     .from("garments")
-    .select("id, owner_id")
+    .select("id, owner_id, is_available")
     .eq("id", garmentId)
     .single();
 }

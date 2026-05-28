@@ -7,6 +7,7 @@ export type Garment = {
   brand?: string | null;
   condition: string;
   style_id?: string | null;
+  is_available?: boolean;
   created_at?: string;
   updated_at?: string;
 };

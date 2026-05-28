@@ -12,6 +12,7 @@ export type FeedGarment = {
   condition: string;
   owner_id: string | null;
   style_id: string | null;
+  is_available: boolean;
   created_at: string;
   styles: FeedStyle | FeedStyle[] | null;
   hasInterest?: boolean;

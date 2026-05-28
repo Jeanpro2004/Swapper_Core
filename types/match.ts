@@ -1,4 +1,9 @@
-export type MatchStatus = "pending" | "accepted" | "rejected" | "completed";
+export type MatchStatus =
+  | "pending"
+  | "accepted"
+  | "rejected"
+  | "cancelled"
+  | "completed";
 
 export type MatchGarment = {
   id: string;
@@ -34,4 +39,8 @@ export type SwapMatch = {
 export type SwapMatchWithGarments = SwapMatch & {
   user_a_garment: MatchGarment | null;
   user_b_garment: MatchGarment | null;
+};
+
+export type UpdateMatchStatusPayload = {
+  status: MatchStatus;
 };

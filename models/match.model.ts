@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { MatchStatus } from "@/types/match";
 
 type CreateSwapMatchData = {
   user_a_id: string;
@@ -97,4 +98,96 @@ export async function getSwapMatchesByUser(userId: string) {
     `)
     .or(`user_a_id.eq.${userId},user_b_id.eq.${userId}`)
     .order("created_at", { ascending: false });
+}
+
+export async function getSwapMatchById(matchId: string) {
+  const supabase = await createClient();
+
+  return supabase
+    .from("swap_matches")
+    .select("*")
+    .eq("id", matchId)
+    .single();
+}
+
+export async function updateSwapMatchStatus(
+  matchId: string,
+  status: MatchStatus
+) {
+  const supabase = await createClient();
+
+  return supabase
+    .from("swap_matches")
+    .update({
+      status,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", matchId)
+    .select("*")
+    .single();
+}
+export async function getSwapMatchesByStatuses(statuses: MatchStatus[]) {
+  const supabase = await createClient();
+
+  return supabase
+    .from("swap_matches")
+    .select(`
+      id,
+      status,
+      user_a_garment_id,
+      user_b_garment_id
+    `)
+    .in("status", statuses);
+}
+
+export async function getSwapMatchesByGarmentIdsAndStatuses(
+  garmentIds: string[],
+  statuses: MatchStatus[]
+) {
+  const supabase = await createClient();
+
+  if (garmentIds.length === 0) {
+    return {
+      data: [],
+      error: null,
+    };
+  }
+
+  const inFilter = `(${garmentIds.join(",")})`;
+
+  return supabase
+    .from("swap_matches")
+    .select(`
+      id,
+      status,
+      user_a_garment_id,
+      user_b_garment_id
+    `)
+    .in("status", statuses)
+    .or(
+      `user_a_garment_id.in.${inFilter},user_b_garment_id.in.${inFilter}`
+    );
+}
+
+export async function updateGarmentsAvailability(
+  garmentIds: string[],
+  isAvailable: boolean
+) {
+  const supabase = await createClient();
+
+  if (garmentIds.length === 0) {
+    return {
+      data: [],
+      error: null,
+    };
+  }
+
+  return supabase
+    .from("garments")
+    .update({
+      is_available: isAvailable,
+      updated_at: new Date().toISOString(),
+    })
+    .in("id", garmentIds)
+    .select("id, title, is_available");
 }

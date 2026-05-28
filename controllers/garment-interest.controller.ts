@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth/getAuthenticatedUser";
 import { tryCreateMatchFromInterest } from "@/services/match-engine.service";
+import { isGarmentAvailableForExchange } from "@/services/garment-availability.service";
+
 import {
   createGarmentInterest,
   deleteGarmentInterest,
@@ -46,11 +48,34 @@ export async function storeGarmentInterestController(request: NextRequest) {
   }
 
   if (garment.owner_id === user.id) {
-    return NextResponse.json(
-      { error: "No puedes marcar interés en tu propia prenda." },
-      { status: 409 }
-    );
-  }
+  return NextResponse.json(
+    { error: "No puedes marcar interés en tu propia prenda." },
+    { status: 409 }
+  );
+}
+
+if (!garment.is_available) {
+  return NextResponse.json(
+    { error: "Esta prenda ya no está disponible para intercambio." },
+    { status: 409 }
+  );
+}
+
+  const availability = await isGarmentAvailableForExchange(garmentId);
+
+if (availability.error) {
+  return NextResponse.json(
+    { error: "No se pudo validar la disponibilidad de la prenda." },
+    { status: 400 }
+  );
+}
+
+if (!availability.available) {
+  return NextResponse.json(
+    { error: "Esta prenda ya no está disponible para intercambio." },
+    { status: 409 }
+  );
+}
 
   const { data: existingInterest } =
     await getGarmentInterestByUserAndGarment(user.id, garmentId);

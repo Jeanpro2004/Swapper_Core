@@ -3,6 +3,8 @@ import {
   getExistingSwapMatch,
 } from "@/models/match.model";
 import { getLatestReciprocalInterest } from "@/models/garment-interest.model";
+import { areGarmentsAvailableForExchange } from "@/services/garment-availability.service";
+import { updateGarmentsAvailability } from "@/models/match.model";
 
 type TryCreateMatchInput = {
   interestedUserId: string;
@@ -44,22 +46,39 @@ export async function tryCreateMatchFromInterest({
     };
   }
 
-  const { data: match, error: matchError } = await createSwapMatch({
-    user_a_id: interestedUserId,
-    user_b_id: targetGarmentOwnerId,
-    user_a_garment_id: currentUserGarmentId,
-    user_b_garment_id: targetGarmentId,
-  });
+  const availability = await areGarmentsAvailableForExchange([
+    currentUserGarmentId,
+    targetGarmentId,
+  ]);
 
-  if (matchError || !match) {
+  if (availability.error || !availability.available) {
     return {
       matchCreated: false,
       match: null,
     };
   }
 
-  return {
+    const { data: match, error: matchError } = await createSwapMatch({
+    user_a_id: interestedUserId,
+    user_b_id: targetGarmentOwnerId,
+    user_a_garment_id: currentUserGarmentId,
+    user_b_garment_id: targetGarmentId,
+    });
+
+    if (matchError || !match) {
+    return {
+        matchCreated: false,
+        match: null,
+    };
+    }
+
+    await updateGarmentsAvailability(
+    [currentUserGarmentId, targetGarmentId],
+    false
+    );
+
+    return {
     matchCreated: true,
     match,
-  };
+    };
 }

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import { SwapMatchWithGarments } from "@/types/match";
+import MatchStatusActions from "@/components/core/MatchStatusActions";
+import { MatchStatus } from "@/types/match";
 
 function getStyleName(
   styles:
@@ -25,6 +27,18 @@ export default function MatchesList() {
   const supabase = createClient();
 
   const [matches, setMatches] = useState<SwapMatchWithGarments[]>([]);
+  function handleLocalStatusChange(matchId: string, nextStatus: MatchStatus) {
+  setMatches((currentMatches) =>
+    currentMatches.map((match) =>
+      match.id === matchId
+        ? {
+            ...match,
+            status: nextStatus,
+          }
+        : match
+    )
+  );
+}
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -119,9 +133,17 @@ export default function MatchesList() {
             </section>
 
             <footer className="card-actions">
-              <p>
-                <strong>Estado:</strong> {match.status}
-              </p>
+                <p>
+                    <strong>Estado:</strong> {match.status}
+                </p>
+
+                <MatchStatusActions
+                    matchId={match.id}
+                    currentStatus={match.status}
+                    onStatusChange={(nextStatus) =>
+                    handleLocalStatusChange(match.id, nextStatus)
+                    }
+                />
             </footer>
           </article>
         ))}

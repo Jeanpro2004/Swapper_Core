@@ -14,6 +14,7 @@ export async function getDiscoverableGarments(currentUserId: string) {
       condition,
       owner_id,
       style_id,
+      is_available,
       created_at,
       styles (
         id,
@@ -21,5 +22,6 @@ export async function getDiscoverableGarments(currentUserId: string) {
       )
     `)
     .neq("owner_id", currentUserId)
+    .eq("is_available", true)
     .order("created_at", { ascending: false });
 }
