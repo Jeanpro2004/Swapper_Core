@@ -47,6 +47,7 @@ export default function Header() {
             <li><Link href="/feed">Feed</Link></li>
             <li><Link href="/matches">Matches</Link></li>
             <li><Link href="/heritage">Heritage</Link></li>
+            <li><Link href="/recommendations">Recomendaciones</Link></li>
 
             {isAdmin && (
               <li>
