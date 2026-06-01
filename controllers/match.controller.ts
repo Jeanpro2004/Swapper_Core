@@ -11,6 +11,7 @@ import {
   validateMatchStatusPayload,
 } from "@/lib/validations/match-status.validation";
 import { MatchStatus } from "@/types/match";
+import { recordMatchStatusEvents } from "@/services/garment-heritage.service";
 
 export async function indexMatchesController(request: NextRequest) {
   const user = await getAuthenticatedUser(request);
@@ -115,6 +116,16 @@ export async function updateMatchStatusController(
   ) {
     await updateGarmentsAvailability(matchGarmentIds, false);
   }
+
+  await recordMatchStatusEvents({
+  matchId: match.id,
+  actorUserId: user.id,
+  userAId: match.user_a_id,
+  userBId: match.user_b_id,
+  userAGarmentId: match.user_a_garment_id,
+  userBGarmentId: match.user_b_garment_id,
+  nextStatus,
+});
 
   return NextResponse.json(data, { status: 200 });
 }

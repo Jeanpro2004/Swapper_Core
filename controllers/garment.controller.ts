@@ -10,6 +10,7 @@ import {
 } from "@/models/garment.model";
 import { validateGarmentPayload } from "@/lib/validations/garment.validation";
 import { getStyleById } from "@/models/style.model";
+import { recordGarmentRegisteredEvent } from "@/services/garment-heritage.service";
 
 async function getAuthenticatedUser(req: NextRequest) {
   const supabase = await createClient();
@@ -125,7 +126,7 @@ export async function storeGarmentController(req: NextRequest) {
     );
   }
 
-  const { data, error } = await createGarment({
+    const { data, error } = await createGarment({
     owner_id: user.id,
     title: body.title,
     description: body.description,
@@ -135,8 +136,16 @@ export async function storeGarmentController(req: NextRequest) {
     style_id: body.style_id,
   });
 
-  if (error) {
+    if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  if (data?.id) {
+    await recordGarmentRegisteredEvent({
+      garmentId: data.id,
+      actorUserId: user.id,
+      garmentTitle: data.title,
+    });
   }
 
   return NextResponse.json(data, { status: 201 });

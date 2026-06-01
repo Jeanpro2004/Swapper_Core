@@ -5,6 +5,7 @@ import {
 import { getLatestReciprocalInterest } from "@/models/garment-interest.model";
 import { areGarmentsAvailableForExchange } from "@/services/garment-availability.service";
 import { updateGarmentsAvailability } from "@/models/match.model";
+import { recordMatchCreatedEvents } from "@/services/garment-heritage.service";
 
 type TryCreateMatchInput = {
   interestedUserId: string;
@@ -76,6 +77,14 @@ export async function tryCreateMatchFromInterest({
     [currentUserGarmentId, targetGarmentId],
     false
     );
+
+    await recordMatchCreatedEvents({
+    matchId: match.id,
+    userAId: interestedUserId,
+    userBId: targetGarmentOwnerId,
+    userAGarmentId: currentUserGarmentId,
+    userBGarmentId: targetGarmentId,
+    });
 
     return {
     matchCreated: true,
