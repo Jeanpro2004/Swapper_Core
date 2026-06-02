@@ -1,4 +1,4 @@
-import StyleProfileCard from "@/components/core/StyleProfileCard";
+import CoreDashboard from "@/components/core/CoreDashboard";
 
 export default function DashboardPage() {
   return (
@@ -7,11 +7,12 @@ export default function DashboardPage() {
         <header className="page-header">
           <h1>Dashboard</h1>
           <p>
-            Resumen inteligente de tu armario y tu identidad de estilo.
+            Resumen central del core de Swapper: armario, estilo, matches,
+            heritage y oportunidades.
           </p>
         </header>
 
-        <StyleProfileCard />
+        <CoreDashboard />
       </div>
     </main>
   );
