@@ -5,6 +5,40 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import { CoreDashboardSummary } from "@/types/core-dashboard";
 
+const STYLE_SUGGESTIONS: Record<string, string[]> = {
+  Minimalista: ["Vintage", "Y2K"],
+  Vintage: ["Minimalista", "Grunge"],
+  Streetwear: ["Y2K", "Grunge"],
+  Grunge: ["Streetwear", "Vintage"],
+  Y2K: ["Streetwear", "Vintage"],
+};
+
+function getSuggestedStyles(
+  dominantStyleName: string | null,
+  styleScore: number
+) {
+  if (!dominantStyleName) {
+    return ["Minimalista", "Vintage", "Streetwear"];
+  }
+
+  const suggestions =
+    STYLE_SUGGESTIONS[dominantStyleName] ?? [
+      "Minimalista",
+      "Vintage",
+      "Streetwear",
+    ];
+
+  if (styleScore >= 75) {
+    return suggestions.slice(0, 2);
+  }
+
+  if (styleScore >= 45) {
+    return suggestions;
+  }
+
+  return ["Minimalista", "Vintage", "Streetwear"];
+}
+
 function formatEventType(eventType: string) {
   const labels: Record<string, string> = {
     garment_registered: "Prenda registrada",
@@ -87,6 +121,11 @@ export default function CoreDashboard() {
     );
   }
 
+  const suggestedStyles = getSuggestedStyles(
+    dashboard.styleScore.dominantStyleName,
+    dashboard.styleScore.score
+  );
+
   return (
     <section aria-label="Dashboard del core">
       <article className="info-card" aria-label="My Style Score">
@@ -135,6 +174,28 @@ export default function CoreDashboard() {
           </ul>
         </section>
       </article>
+
+      <section className="info-card" aria-label="Sugerencias de estilo">
+        <h2>Sugerencias de estilo</h2>
+
+        <p>Tu estilo predominante es:</p>
+
+        <h3>{dashboard.styleScore.dominantStyleName ?? "No definido"}</h3>
+
+        <p className="style-score-value">
+          <strong>{dashboard.styleScore.score}%</strong>
+        </p>
+
+        <h4>{dashboard.styleScore.label}</h4>
+
+        <p>Te sugerimos probar estos estilos que van con tu vibe:</p>
+
+        <ul>
+          {suggestedStyles.map((style) => (
+            <li key={style}>{style}</li>
+          ))}
+        </ul>
+      </section>
 
       <div className="card-grid">
         <article className="info-card">
