@@ -36,6 +36,8 @@ function getSuggestedStyles(
     return suggestions;
   }
 
+
+
   return ["Minimalista", "Vintage", "Streetwear"];
 }
 
